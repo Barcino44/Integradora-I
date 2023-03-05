@@ -6,9 +6,11 @@ public class Main {
         int rows=0;
         int columns=0;
         int boardSize=0;
+        int actualTurn=1;
         int snakes=0;
         int ladders=0;
         int option;
+        int selectionOptionInmenuInTurn;
         do {
             System.out.println("\nWelcome to ladders and Snakes");
             System.out.println("1.Play");
@@ -32,20 +34,37 @@ public class Main {
                 for (int i = 1; i <= boardSize; i++) {
                     board.generateBoard(i);
                 }
-                System.out.println("Ingrese el numero de serpientes");
-                while (!reader.hasNextInt()) {
-                    reader.next();
-                    System.out.println("Invalid, enter a level number");
-                }
-                snakes=reader.nextInt();
-
-                while (boardSize/7>=snakes){
-                    System.out.println("You have reach the maximum of snakes");
-                    System.out.println("Enter the number of snakes again");
-                    snakes= reader.nextInt();
-                }
-                board.generateSnakes(3,boardSize);
                 board.print();
+                while(actualTurn<=4){ //Condicion de parada, se debe cambiar
+                    board.showMenuInTurn(actualTurn);
+                    selectionOptionInmenuInTurn=reader.nextInt();
+                    if(selectionOptionInmenuInTurn==1) {
+                        int dice = (int) (Math.random() * 6 + 1);
+                        board.rollDice(dice, actualTurn);
+                        board.print();
+                        actualTurn++;
+                        if(actualTurn==4){
+                            actualTurn=1;
+                        }
+                    }
+                    else{
+
+                    }
+                }
+
+//                System.out.println("Ingrese el numero de serpientes");
+//                while (!reader.hasNextInt()) {
+//                    reader.next();
+//                    System.out.println("Invalid, enter a level number");
+//                }
+//                snakes=reader.nextInt();
+//
+//                while (boardSize/7>=snakes){
+//                    System.out.println("You have reach the maximum of snakes");
+//                    System.out.println("Enter the number of snakes again");
+//                    snakes= reader.nextInt();
+//                }
+//                board.generateSnakes(3,boardSize);
             }
         } while (option!=2);
     }
