@@ -1,16 +1,18 @@
 import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
-        Board board = new Board();
+
+
         Scanner reader = new Scanner(System.in);
-        int rows=0;
-        int columns=0;
-        int boardSize=0;
+
+        Board board = new Board();
+
+
         int actualTurn=1;
-        int snakes=0;
-        int ladders=0;
-        int option;
-        int selectionOptionInmenuInTurn;
+        int snakes, ladders=0;
+        int option, selectionOptionInmenuInTurn;
+        int rows,columns,boardSize=0;
+
         do {
             System.out.println("\nWelcome to ladders and Snakes");
             System.out.println("1.Play");
@@ -24,7 +26,7 @@ public class Main {
                     System.out.println("Invalid, enter a level number");
                 }
                 rows = reader.nextInt();
-                System.out.println("Enter the number of rows that you want to add");
+                System.out.println("Enter the number of columns that you want to add");
                 while (!reader.hasNextInt()) {
                     reader.next();
                     System.out.println("Invalid, enter a level number");
@@ -35,10 +37,12 @@ public class Main {
                     board.generateBoard(i);
                 }
                 board.print();
-                while(actualTurn<=4){ //Condicion de parada, se debe cambiar
+                while(actualTurn <= 4){ //Condicion de parada, se debe cambiar
                     board.showMenuInTurn(actualTurn);
                     selectionOptionInmenuInTurn=reader.nextInt();
+
                     if(selectionOptionInmenuInTurn==1) {
+
                         int dice = (int) (Math.random() * 6 + 1);
                         board.rollDice(dice, actualTurn);
                         board.print();

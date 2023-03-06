@@ -4,6 +4,7 @@ public class Board {
     private Node tail;
 
     public void generateBoard(int number){
+
         Player playerOne= new Player(1,"$",0);
         Player playerTwo=new Player(2,"%",0);
         Player playerThree=new Player(3,"#",0);
