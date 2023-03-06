@@ -2,13 +2,12 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
 
-
         Scanner reader = new Scanner(System.in);
 
         Board board = new Board();
 
 
-        int actualTurn=1;
+        int actualTurn=1; //contador de turnos
         int snakes, ladders=0;
         int option, selectionOptionInmenuInTurn;
         int rows,columns,boardSize=0;
@@ -56,19 +55,19 @@ public class Main {
                     }
                 }
 
-//                System.out.println("Ingrese el numero de serpientes");
-//                while (!reader.hasNextInt()) {
-//                    reader.next();
-//                    System.out.println("Invalid, enter a level number");
-//                }
-//                snakes=reader.nextInt();
-//
-//                while (boardSize/7>=snakes){
-//                    System.out.println("You have reach the maximum of snakes");
-//                    System.out.println("Enter the number of snakes again");
-//                    snakes= reader.nextInt();
-//                }
-//                board.generateSnakes(3,boardSize);
+                System.out.println("Ingrese el numero de serpientes");
+                  while (!reader.hasNextInt()) {
+                  reader.next();
+                   System.out.println("Invalid, enter a level number");
+               }
+                snakes=reader.nextInt();
+
+               while (boardSize/7>=snakes){
+                  System.out.println("You have reach the maximum of snakes");
+                   System.out.println("Enter the number of snakes again");
+                  snakes= reader.nextInt();
+              }
+              board.generateSnakes(3,boardSize);
             }
         } while (option!=2);
     }

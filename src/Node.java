@@ -1,16 +1,15 @@
 public class Node {
     private int number;
-    private Player playerOne;
-
-    private Player playerTwo;
-
-    private Player playerThree;
-    private Node snake;
-    private Node ladder;
+    private Player playerOne, playerTwo, playerThree;
+    private Node snake, ladder;
     private Node next;
     private Node previous;
 
+    /*Con la ayuda de este constructor, establecemos los parametros del tablero inicial
+    *number int: tamaño del tablero
+    * Players: Jugadores que serán colocados en la primer casilla del tablero al iniciar el juego*/
     public Node(int number, Player playerOne, Player playerTwo, Player playerThree) {
+
         this.number = number;
         this.playerOne = playerOne;
         this.playerTwo = playerTwo;

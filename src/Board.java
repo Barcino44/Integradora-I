@@ -1,18 +1,27 @@
 import java.lang.Math;
+import java.util.Random;
 public class Board {
     private Node head;
     private Node tail;
 
+    Random random = new Random();
+
     public void generateBoard(int number){
 
-        Player playerOne= new Player(1,"$",0);
-        Player playerTwo=new Player(2,"%",0);
-        Player playerThree=new Player(3,"#",0);
-        Node nodeHead=new Node(number,playerOne,playerTwo,playerThree);
-        Node nodeEmpty=new Node(number,null,null,null);
+        /*Generamos los tres jugadores, con sus parametros iniciales
+        * ni su turno ni su icono serán modificados, pues se encuentran preestablecidos*/
+
+        Player playerOne = new Player(1,"$",0);
+        Player playerTwo =new Player(2,"%",0);
+        Player playerThree =new Player(3,"#",0);
+
+        Node nodeHead = new Node(number,playerOne,playerTwo,playerThree);
+
+        Node nodeEmpty = new Node(number,null,null,null);
+
         if (head == null) { //Si la cabeza es vacia, le metemos el nodo con los jugadores
             head = nodeHead;
-            tail=nodeHead;
+            tail= nodeHead;
         }else{ //Si no, dejamos los demas nodos sin jugadores.
             tail.setNext(nodeEmpty);
             nodeEmpty.setPrevious(tail);
@@ -20,12 +29,24 @@ public class Board {
         }
     }
     public void generateSnakes(int numberOfSnakes, int boardSize){
+
         generateSnakes(head, numberOfSnakes, boardSize);
+
     }
-    public void generateSnakes(Node current,int numberOfSnakes,int boardSize) {
-        int positionSnakeH = (int) (Math.floor(Math.random() * (2 - boardSize) + boardSize));
+    private void generateSnakes(Node current,int numberOfSnakes,int boardSize) {
+
+        /*int positionSnakeH = (int) (Math.floor(Math.random() * (2 - boardSize) + boardSize));
+
         if (positionSnakeH == current.getNumber()) {
             current.setSnake(current);
+        }Lina : documenté esto porque no se que hiciste*/
+
+        for (int i = 0; i < numberOfSnakes; i++) {
+
+            char caracter = (char) ('A' + i); //Para asignarle el identificador a las serpientes
+            int headS = random.nextInt(boardSize - 10) + 1;
+            int tailS = random.nextInt(boardSize- headS) + headS + 1;
+
         }
     }
 
@@ -35,37 +56,48 @@ public class Board {
 //        }
 //    }
     public void showMenuInTurn(int actualTurn){
+
         showMenuInTurn(head,actualTurn);
+
     }
-    public void showMenuInTurn(Node current, int actualTurn) {
+    private void showMenuInTurn(Node current, int actualTurn) {
+
         if(current==null){
             return;
         }
-        String msg="1. Tirar dado\n" +
-                "2.Ver escaleras y serpientes";
-        if (current.getPlayerOne()!=null&&current.getPlayerOne().getTurn()==actualTurn) {
-            System.out.println("\nJugador" + current.getPlayerOne().getIcon() + " es tu turno\n" +
-                    msg);
+
+        String msg="1.Tirar dado\n2.Ver escaleras y serpientes";
+
+        if (current.getPlayerOne()!=null && current.getPlayerOne().getTurn()==actualTurn) {
+
+            System.out.println("\nJugador "+ current.getPlayerOne().getIcon() + " es tu turno\n" + msg);
         }
-        else if (current.getPlayerTwo()!=null&&current.getPlayerTwo().getTurn() == actualTurn) {
-            System.out.println("\nJugador " + current.getPlayerTwo().getIcon() + " es tu turno\n"+
-                    msg);
+        else if (current.getPlayerTwo()!=null && current.getPlayerTwo().getTurn() == actualTurn) {
+
+            System.out.println("\nJugador " + current.getPlayerTwo().getIcon() + " es tu turno\n"+ msg);
+
         }
         else if (current.getPlayerThree()!=null&&current.getPlayerThree().getTurn() == actualTurn){
-            System.out.println("\nJugador" + current.getPlayerThree().getIcon() + " es tu turno\n" +
-                    msg);
+
+            System.out.println("\nJugador" + current.getPlayerThree().getIcon() + " es tu turno\n" + msg);
+
         }
         showMenuInTurn(current.getNext(),actualTurn);
     }
     public void rollDice(int dice, int actualTurn){
+
         rollDice(head,dice,actualTurn);
+
     }
-    public void rollDice(Node current,int dice,int actualTurn){
+    private void rollDice(Node current,int dice,int actualTurn){
+
         if(dice==0){
             return;
         }
         if(actualTurn==1){
+
             if(current.getPlayerOne()!=null) {
+
                 Player thePlayer = current.getPlayerOne();
                 current.setPlayerOne(null);
                 current.getNext().setPlayerOne(thePlayer);
@@ -102,6 +134,7 @@ public class Board {
         print(head);
     }
     private void print(Node current){
+
         if(current==null){
             return;
         }
