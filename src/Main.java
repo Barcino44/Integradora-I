@@ -32,9 +32,9 @@ public class Main {
                 }
                 columns = reader.nextInt();
                 boardSize=columns*rows;
-                for (int i = 1; i <= boardSize; i++) {
-                    board.generateBoard(i);
-                }
+
+                board.generateBoard(boardSize);
+
                 board.print();
                 while(actualTurn <= 4){ //Condicion de parada, se debe cambiar
                     board.showMenuInTurn(actualTurn);

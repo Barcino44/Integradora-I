@@ -1,38 +1,36 @@
 import java.lang.Math;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 public class Board {
     private Node head;
     private Node tail;
 
+    private List<List<Integer>> serpientes = new ArrayList<>();
     Random random = new Random();
 
-    public void generateBoard(int number){
-
+    public void generateBoard(int boardSize){
         /*Generamos los tres jugadores, con sus parametros iniciales
         * ni su turno ni su icono serán modificados, pues se encuentran preestablecidos*/
-
         Player playerOne = new Player(1,"$",0);
         Player playerTwo =new Player(2,"%",0);
         Player playerThree =new Player(3,"#",0);
+        head = new Node(1, playerOne,playerTwo,playerThree);
 
-        Node nodeHead = new Node(number,playerOne,playerTwo,playerThree);
-
-        Node nodeEmpty = new Node(number,null,null,null);
-
-        if (head == null) { //Si la cabeza es vacia, le metemos el nodo con los jugadores
-            head = nodeHead;
-            tail= nodeHead;
-        }else{ //Si no, dejamos los demas nodos sin jugadores.
-            tail.setNext(nodeEmpty);
-            nodeEmpty.setPrevious(tail);
-            tail = nodeEmpty;
+        Node aux = head;
+        for(int i=1; i<=boardSize;i++){
+            Node nodeEmpty = new Node(i, null,null,null);
+            aux.setNext(nodeEmpty);
+            aux = aux.getNext();
         }
+        tail = aux;
     }
     public void generateSnakes(int numberOfSnakes, int boardSize){
 
         generateSnakes(head, numberOfSnakes, boardSize);
 
     }
+
     private void generateSnakes(Node current,int numberOfSnakes,int boardSize) {
 
         /*int positionSnakeH = (int) (Math.floor(Math.random() * (2 - boardSize) + boardSize));
@@ -41,13 +39,17 @@ public class Board {
             current.setSnake(current);
         }Lina : documenté esto porque no se que hiciste*/
 
-        for (int i = 0; i < numberOfSnakes; i++) {
+       /* for (int i = 0; i < numberOfSnakes; i++) {
 
             char caracter = (char) ('A' + i); //Para asignarle el identificador a las serpientes
-            int headS = random.nextInt(boardSize - 10) + 1;
+            int headS = random.nextInt(boardSize - 10
+            ) + 1;
             int tailS = random.nextInt(boardSize- headS) + headS + 1;
 
-        }
+
+
+        }*/
+
     }
 
 //    public void generateSnakeAndLadderBoard(Node current){

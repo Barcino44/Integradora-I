@@ -5,11 +5,12 @@ public class Node {
     private Node next;
     private Node previous;
 
+    private Node key;
+
     /*Con la ayuda de este constructor, establecemos los parametros del tablero inicial
     *number int: tamaño del tablero
     * Players: Jugadores que serán colocados en la primer casilla del tablero al iniciar el juego*/
-    public Node(int number, Player playerOne, Player playerTwo, Player playerThree) {
-
+    public Node( int number, Player playerOne, Player playerTwo, Player playerThree) {
         this.number = number;
         this.playerOne = playerOne;
         this.playerTwo = playerTwo;
