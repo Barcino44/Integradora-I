@@ -4,8 +4,7 @@ public class Node {
     private Node snake, ladder;
     private Node next;
     private Node previous;
-
-    private Node key;
+    private String letter;
 
     /*Con la ayuda de este constructor, establecemos los parametros del tablero inicial
     *number int: tamaño del tablero
@@ -80,4 +79,53 @@ public class Node {
     public void setPrevious(Node previous) {
         this.previous = previous;
     }
+
+    public String getLetter() {
+        return letter;
+    }
+
+    public void setLetter(String letter) {
+        this.letter = letter;
+    }
+    /*
+    Me imprime el estado el nodo (Es clave para el momento de la impresión)
+     */
+    public String printStatus(){
+        String statusOne="";
+        String statusTwo="";
+        String statusThree="";
+        if(playerOne!=null) {
+            statusOne = playerOne.getIcon();
+        }
+        if (playerTwo!=null){
+            statusTwo=playerTwo.getIcon();
+        }
+        if(playerThree!=null) {
+            statusThree = playerThree.getIcon();
+        }
+        return "[" + number +
+                statusOne+
+                statusTwo+
+                statusThree+
+                "]";
+    }
+    /*
+    Me imprime el estado sin el número (Es clave para limpiar el tablero)
+     */
+    public String printStatusWithoutNumber(){
+        String statusOne="";
+        String statusTwo="";
+        String statusThree="";
+        if(playerOne!=null) {
+            statusOne = playerOne.getIcon();
+        }
+        if (playerTwo!=null){
+            statusTwo=playerTwo.getIcon();
+        }
+        if(playerThree!=null) {
+            statusThree = playerThree.getIcon();
+        }
+        return statusOne+ statusTwo+ statusThree;
+    }
+
 }

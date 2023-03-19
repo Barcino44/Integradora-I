@@ -2,169 +2,355 @@ import java.lang.Math;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-public class Board {
-    private Node head;
-    private Node tail;
+import java.util.Stack;
 
-    private List<List<Integer>> serpientes = new ArrayList<>();
+public class Board {
+    public static int counter = 0;
+    private Node head; //Es la cabeza del tablero (casilla 1)
+    private Node tail; //Es la cola del tablero (última casilla)
+    private NodeScore root; //Es la raíz del árbol de búsqueda.
+    public Node actualNode; // Me guarda el nodo actual.
+
+    //Es mejor tener los jugadores en board para que no tengamos que acceder a algún nodo si queremos hacer operacion con ellos.
+    Player playerOne = new Player(1, "$", 0);
+    Player playerTwo = new Player(2, "%", 0);
+    Player playerThree = new Player(3, "#", 0);
+
+    private final ArrayList<Integer> snakes = new ArrayList<>();
     Random random = new Random();
 
-    public void generateBoard(int boardSize){
+    public void generateBoard(int i, int boardSize) {
         /*Generamos los tres jugadores, con sus parametros iniciales
-        * ni su turno ni su icono serán modificados, pues se encuentran preestablecidos*/
-        Player playerOne = new Player(1,"$",0);
-        Player playerTwo =new Player(2,"%",0);
-        Player playerThree =new Player(3,"#",0);
-        head = new Node(1, playerOne,playerTwo,playerThree);
-
-        Node aux = head;
-        for(int i=1; i<=boardSize;i++){
-            Node nodeEmpty = new Node(i, null,null,null);
-            aux.setNext(nodeEmpty);
-            aux = aux.getNext();
-        }
-        tail = aux;
+         * ni su turno ni su icono serán modificados, pues se encuentran preestablecidos*/
+        head = new Node(i, playerOne, playerTwo, playerThree);
+        tail = head;
+        generateBoardRecursive(i + 1, boardSize);
     }
-    public void generateSnakes(int numberOfSnakes, int boardSize){
+
+    private void generateBoardRecursive(int i, int boardSize) {
+        if (boardSize < i) {
+            return;
+        }
+        Node emptyNode = new Node(i, null, null, null);
+        tail.setNext(emptyNode); //La posicion despues de la cola es el nodo entrante. (creo el enlace ->)
+        emptyNode.setPrevious(tail); //La posicion previa del nodo entrante es la cola. (creo el enlace <-)
+        tail = emptyNode;//Tail es ahora el nodo entrante.
+        generateBoardRecursive(i + 1, boardSize);
+    }
+
+    public void generateSnakes(int numberOfSnakes, int boardSize) {
 
         generateSnakes(head, numberOfSnakes, boardSize);
 
     }
 
-    private void generateSnakes(Node current,int numberOfSnakes,int boardSize) {
+    private void generateSnakes(Node current, int numberOfSnakes, int boardSize) {
+        for (int i = 0; i < numberOfSnakes; i++) {
+            boolean snakeMatch = false;
+            while (!snakeMatch) {
+                //Vamos a añadir una serpiente desde la posicion 2 hasta board - 1, es el rango para añadir serpientes.
+                int high = random.nextInt(2, boardSize - 1);
+                int low = random.nextInt(2, boardSize - 1);
+                //Aqui se está validando de que no exista una serpiente en la casilla
+                if (!snakes.contains(high) && !snakes.contains(low) && high > low) {
+                    snakes.add(high);
+                    snakes.add(low);
+                    snakeMatch = true;
+                }
+            }
+        }
+        /// Asigna letra al tablero
+        Node node = head;
+        int asciiValue = 65;
+        while (node.getNext() != null) {
+            if (snakes.contains(node.getNumber())) {
+                node.setLetter((char) asciiValue + " ");
+                asciiValue++;
+            }
+            node = node.getNext();
+        }
 
-        /*int positionSnakeH = (int) (Math.floor(Math.random() * (2 - boardSize) + boardSize));
-
-        if (positionSnakeH == current.getNumber()) {
-            current.setSnake(current);
-        }Lina : documenté esto porque no se que hiciste*/
-
-       /* for (int i = 0; i < numberOfSnakes; i++) {
-
-            char caracter = (char) ('A' + i); //Para asignarle el identificador a las serpientes
-            int headS = random.nextInt(boardSize - 10
-            ) + 1;
-            int tailS = random.nextInt(boardSize- headS) + headS + 1;
+        auxPrintBoardWithSnakes();
+    }
 
 
+    public void auxPrintBoardWithSnakes() {
+        Node auxRecorrido = head;
+        while (auxRecorrido.getNext() != null) {
+            System.out.print("[" + auxRecorrido.getNumber() + auxRecorrido.getLetter() + "] ");
+            auxRecorrido = auxRecorrido.getNext();
+        }
+    }
 
-        }*/
+    public void showMenuInTurn(int actualTurn) {
+
+        showMenuInTurn(head, actualTurn);
 
     }
 
-//    public void generateSnakeAndLadderBoard(Node current){
-//        if(current==){
-//            System.out.println();
-//        }
-//    }
-    public void showMenuInTurn(int actualTurn){
-
-        showMenuInTurn(head,actualTurn);
-
-    }
     private void showMenuInTurn(Node current, int actualTurn) {
 
-        if(current==null){
+        if (current == null) {
             return;
         }
 
-        String msg="1.Tirar dado\n2.Ver escaleras y serpientes";
+        String msg = "1.Tirar dado\n2.Ver escaleras y serpientes";
 
-        if (current.getPlayerOne()!=null && current.getPlayerOne().getTurn()==actualTurn) {
+        if (current.getPlayerOne() != null && current.getPlayerOne().getTurn() == actualTurn) {
 
-            System.out.println("\nJugador "+ current.getPlayerOne().getIcon() + " es tu turno\n" + msg);
-        }
-        else if (current.getPlayerTwo()!=null && current.getPlayerTwo().getTurn() == actualTurn) {
+            System.out.println("\nJugador " + playerOne.getIcon() + " es tu turno\n" + msg);
+        } else if (current.getPlayerTwo() != null && current.getPlayerTwo().getTurn() == actualTurn) {
 
-            System.out.println("\nJugador " + current.getPlayerTwo().getIcon() + " es tu turno\n"+ msg);
+            System.out.println("\nJugador " + playerTwo.getIcon() + " es tu turno\n" + msg);
 
-        }
-        else if (current.getPlayerThree()!=null&&current.getPlayerThree().getTurn() == actualTurn){
+        } else if (current.getPlayerThree() != null && current.getPlayerThree().getTurn() == actualTurn) {
 
-            System.out.println("\nJugador" + current.getPlayerThree().getIcon() + " es tu turno\n" + msg);
+            System.out.println("\nJugador " + playerThree.getIcon() + " es tu turno\n" + msg);
 
         }
-        showMenuInTurn(current.getNext(),actualTurn);
+        showMenuInTurn(current.getNext(), actualTurn);
     }
-    public void rollDice(int dice, int actualTurn){
 
-        rollDice(head,dice,actualTurn);
+    public void rollDice(int dice, int actualTurn) {
+
+        rollDice(head, dice, actualTurn);
 
     }
-    private void rollDice(Node current,int dice,int actualTurn){
+    /*
+    Tirar dado.
+     */
+    private void rollDice(Node current, int dice, int actualTurn) {
 
-        if(dice==0){
+        if (dice == 0) { //El caso base es que el dado sea ==0.
             return;
         }
-        if(actualTurn==1){
-
-            if(current.getPlayerOne()!=null) {
-
-                Player thePlayer = current.getPlayerOne();
-                current.setPlayerOne(null);
-                current.getNext().setPlayerOne(thePlayer);
-                rollDice(current.getNext(), dice - 1,actualTurn);
-            }
-            else{
-            rollDice(current.getNext(),dice,actualTurn);
-            }
+        if (current.getNext() == null) {
+            return;
         }
-        else if (actualTurn==2) {
-            if(current.getPlayerTwo()!=null) {
+        if (actualTurn == 1) { //El jugador actual es el 1.
+
+            if (current.getPlayerOne() != null) {
+                Player thePlayer = current.getPlayerOne(); //Obtengo el jugador del nodo.
+                current.setPlayerOne(null); //Seteo el nodo actual con nulo.
+                current.getNext().setPlayerOne(thePlayer); //Seteo el nodo siguiente con el jugador.
+                rollDice(current.getNext(), dice - 1, actualTurn); //Hago recursion y le quito 1 al dado, ya que me moví.
+            } else {
+                rollDice(current.getNext(), dice, actualTurn); //Si no, hago recursion hasta que encuentre al jugador.
+            }
+                                                               //Es igual con los demás players.
+        } else if (actualTurn == 2) { //El jugador actual es el 2.
+            if (current.getPlayerTwo() != null) {
                 Player thePlayer = current.getPlayerTwo();
                 current.setPlayerTwo(null);
                 current.getNext().setPlayerTwo(thePlayer);
-                rollDice(current.getNext(), dice - 1,actualTurn);
+                rollDice(current.getNext(), dice - 1, actualTurn);
+            } else {
+                rollDice(current.getNext(), dice, actualTurn);
             }
-            else{
-                rollDice(current.getNext(),dice,actualTurn);
-            }
-        }
-        else{
-            if(current.getPlayerThree()!=null) {
+        } else { //El jugador actual es el 3.
+            if (current.getPlayerThree() != null) {
                 Player thePlayer = current.getPlayerThree();
                 current.setPlayerThree(null);
                 current.getNext().setPlayerThree(thePlayer);
-                rollDice(current.getNext(), dice - 1,actualTurn);
-            }
-            else{
-                rollDice(current.getNext(),dice,actualTurn);
+                rollDice(current.getNext(), dice - 1, actualTurn);
+            } else {
+                rollDice(current.getNext(), dice, actualTurn);
             }
         }
     }
-    public void print(){
-        print(head);
-    }
-    private void print(Node current){
 
-        if(current==null){
+    public void goToBackward(int positionToReturn, Node current) {
+        Node aux = head;
+        boolean foundReturn = false;
+        while (aux.getNext() != null && !foundReturn) {
+            if (aux.getNumber() == positionToReturn) {
+                current = aux;
+                foundReturn = true;
+            } else {
+                aux = aux.getNext();
+            }
+        }
+    }
+
+    public void verifySnake(Node current) {
+        Node aux = head;
+        int snakeReturn = -1;
+        boolean isReturned = false;
+        while (aux.getNext() != null && !isReturned) {
+            if (snakes.contains(aux.getNumber())) {
+                int snakeNumber = snakes.indexOf(aux.getNumber());
+                if (snakeNumber % 2 != 0) { /// Comprobar si es cabeza o cola
+                    if (snakeNumber < snakes.size()) { /// para que no se desborde
+                        isReturned = true;
+                        goToBackward(snakeNumber, current);
+                        break;
+                    }
+
+                } //// Para no hacer nada cuando estoy en la cabeza (la casilla mas baja))
+            }
+            aux = aux.getNext();
+        }
+    }
+    /*
+    Activador de impresión.
+     */
+    public void print(int rows, int columns) {
+        printRow(tail, rows, columns);
+    }
+    /*
+    Imprime una fila de forma ascendente
+     */
+    private void printRow(Node current, int rows, int columns) {
+        if (current == null) {
             return;
         }
-        if(current.getPlayerOne()!=null&&current.getPlayerTwo()!=null&&current.getPlayerThree()!=null) {
-            System.out.print("[" + current.getNumber() + current.getPlayerOne().getIcon() + current.getPlayerTwo().getIcon() + current.getPlayerThree().getIcon() + "]" + " ");
+        if (rows % 2 == 0) { //Significa que el número de filas es par. Como imprimo desde la cola, para que la primera casilla del tablero esté en la esquina inferior izq, debo primero imprimir en orden.
+            if (counter != columns) { //Si el contador es != a las columnas, imprimimos de forma normal.
+                counter++;
+                System.out.print(current.printStatus() + " ");
+                printRow(current.getPrevious(), rows, columns);
+            } else {  //Si no, hacemos salto de línea, seteamos al contador y vamos al otro método.
+                System.out.println();
+                counter = 0;
+                printReverseRow(current, rows, columns);
+                continuePrinting(rows, columns);
+            }
+        } else { //Significa que el número de filas es impar. Como imprimo desde la cola, para que el primer nodo quede en la esquina inferior izq debo comenzar imprimiendo en reversa.
+            if (counter != columns) {
+                printReverseRow(current, rows, columns); //Cuando imprimo en reversa <- , llego a la ultima casilla.
+                continuePrinting(rows, columns);  //Este método me guarda esa casilla y vuelve a llamar a este método para que me imprima para el otro lado ->.
+            }
         }
-        else if(current.getPlayerOne()!=null&&current.getPlayerTwo()!=null){
-            System.out.print("["+current.getNumber()+current.getPlayerOne().getIcon()+current.getPlayerTwo().getIcon()+"]" + " ");
+    }
+    /*
+    Imprime una fila en reversa.
+     */
+    private void printReverseRow(Node current, int rows, int columns) {
+        if (columns == counter || current == null) { //Si las columnas son iguales al contador o el nodo actual, es nulo, finaliza el llamado.
+            counter = 0;
+            actualNode = current; //Antes de retornar, guardo el nodo actual en el que me encuentro.
+            return;
         }
-        else if(current.getPlayerOne()!=null&&current.getPlayerThree()!=null){
-            System.out.print("["+current.getNumber()+current.getPlayerOne().getIcon()+current.getPlayerThree().getIcon()+"]" + " ");
+        counter++;
+        printReverseRow(current.getPrevious(), rows, columns); //Hago recursion hasta que se cumplan los casos bases.
+        System.out.print(current.printStatus() + " "); //Cuando hago return, me imprime de atrás para adelante.
+    }
+    /*
+    Este método me permite seguir imprimiendo desde el nodo actual obtenido en print reverse.
+     */
+    public void continuePrinting(int rows, int columns) {
+        if (actualNode != null) {
+            System.out.println();
+            printRow(actualNode, rows, columns); //Vuelvo a llamar a print row para que me continue con la impresión.
         }
-        else if (current.getPlayerTwo()!=null&&current.getPlayerThree()!=null) {
-            System.out.print("["+current.getNumber()+current.getPlayerTwo().getIcon()+current.getPlayerThree().getIcon()+"]" + " ");
+    }
+    /*
+    Método que me verifica si existe un jugador en la cola
+     */
+    public boolean finishGame() {
+        boolean isFinished = false;
+        if (tail.getPlayerOne() != null || tail.getPlayerTwo() != null || tail.getPlayerThree() != null) {
+            isFinished = true;
         }
-        else if(current.getPlayerOne()!=null){
-            System.out.print("[" + current.getNumber()+current.getPlayerOne().getIcon() + "]" + " ");
+        return isFinished;
+    }
+    /*
+    Activador de clean board.
+     */
+    public void cleanBoard() {
+        cleanBoard(head);
+    }
+    /*
+     Método que me limpia el tablero.
+     */
+    public void cleanBoard(Node current) {
+        boolean isFinished = finishGame();
+        if (current == null) {
+            return;
         }
-        else if(current.getPlayerTwo()!=null){
-            System.out.print("[" + current.getNumber()+current.getPlayerTwo().getIcon() + "]" + " ");
+        if (isFinished) {
+            if (!current.printStatusWithoutNumber().equals("")) { //El metodo print status without number, me verifica si existe alguien en el nodo actual.
+                current.setPlayerOne(null); //Si existe es porque el estado del nodo sin el número es distinto a "", entonces hago null.
+                current.setPlayerTwo(null);
+                current.setPlayerThree(null);
+                head.setPlayerOne(playerOne); //Seteo los players en la cabeza
+                head.setPlayerTwo(playerTwo);
+                head.setPlayerThree(playerThree);
+            }
+            cleanBoard(current.getNext()); //Realizo un recorrido total por el tablero
         }
-        else if(current.getPlayerThree()!=null){
-            System.out.print("[" + current.getNumber()+current.getPlayerThree().getIcon() + "]" + " ");
+    }
+    /*
+    Anado nodos al arbol binario de busqueda en caso de que la root esté vacia.
+     */
+    public void addScore(double time) {
+        double score = (600 - time) / 6;
+        if (tail.getPlayerOne() != null) {
+            playerOne.setScore(score);
+            NodeScore newNodeScore = new NodeScore(playerOne.getScore(), playerOne);
+            if (root == null) {
+                root = newNodeScore;
+            } else {
+                addNode(root, newNodeScore);
+            }
+        } else if (tail.getPlayerTwo() != null) {
+            playerTwo.setScore(score);
+            NodeScore newNodeScore = new NodeScore(playerTwo.getScore(), playerTwo);
+            if (root == null) {
+                root = newNodeScore;
+            } else {
+                addNode(root, newNodeScore);
+            }
+        } else if (tail.getPlayerThree() != null) {
+            playerThree.setScore(score);
+            NodeScore newNodeScore = new NodeScore(playerThree.getScore(), playerThree);
+            if (root == null) {
+                root = newNodeScore;
+            } else {
+                addNode(root, newNodeScore);
+            }
         }
-        else{
-            System.out.print("[" + current.getNumber() + "]" + " ");
+    }
+    /*
+     Anado los nodos de tipo nodeScore al arbol binario de busqueda en caso de que la root no este vacia.
+    */
+    private void addNode(NodeScore current, NodeScore nodeScore) {
+        //Meter a la izquierda
+        if (nodeScore.getScore() < current.getScore()) { //Si el nodo entrante comparado con el nodo actual, es menor, lo ponemos a la izq
+            if (current.getLeft() == null) { //Aqui es si el nodo de la izquierda esta vacia, si es a si, colocamos el nodo nuevo.
+                current.setLeft(nodeScore);
+            } else {
+                addNode(current.getLeft(), nodeScore); //Si no, vamos a la izq y volvemos a hacer el llamado al metodo.
+            }
+        } else if (nodeScore.getScore() > current.getScore()) { //Si el nodo entrante comparado con el actual es mayor, lo ponemos a la der.
+            //Meter a la derecha
+            if (current.getRight() == null) { //Si la derecha del actual esta vacio, colocamos el nodo alli.
+                current.setRight(nodeScore);
+            } else {
+                addNode(current.getRight(), nodeScore);//Si no, vamos a la der y volvemos a hacer el llamado al metodo.
+            }
+
+        } else {
+            //No hacer nada
         }
-        print(current.getNext());
+    }
+    /*
+    Activador leaderBoard.
+     */
+    public void leaderBoard() {
+        leaderBoard(root);
+    }
+    /*Imprimir puntajes en orden ascendente
+    Este metodo imprime los puntajes en orden descendente
+     */
+    private void leaderBoard(NodeScore current) {
+        if (current == null) { //Caso base, si el actual es ==null, retorna todo el metodo, el proceso de impresion inicia...
+            return;
+        }
+        leaderBoard(current.getRight());//Como el mayor es el de la der, nos dirijimos a el, cuando no haya más izquierda, imprime, regresa a la rama principal y se va a la izq, asi hasta terminar con todos los datos.
+        System.out.print("\nPlayer "+current.getPlayer().getIcon()+ " con un puntaje de " + current.getScore());
+        leaderBoard(current.getLeft());
     }
 }
+
 

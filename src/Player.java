@@ -2,9 +2,9 @@ public class Player {
     private int turn;
     private String icon;
 
-    private int score;
+    private double  score;
 
-    public Player(int turn, String icon, int score) {
+    public Player(int turn, String icon, double score) {
         this.turn = turn;
         this.icon = icon;
         this.score = score;
@@ -26,11 +26,11 @@ public class Player {
         this.icon = icon;
     }
 
-    public int getScore() {
+    public double getScore() {
         return score;
     }
 
-    public void setScore(int score) {
+    public void setScore(double score) {
         this.score = score;
     }
 }

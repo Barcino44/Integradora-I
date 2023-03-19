@@ -1,5 +1,8 @@
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Scanner;
 public class Main {
+    public static int counter=0;
     public static void main(String[] args) {
 
         Scanner reader = new Scanner(System.in);
@@ -13,62 +16,58 @@ public class Main {
         int rows,columns,boardSize=0;
 
         do {
-            System.out.println("\nWelcome to ladders and Snakes");
-            System.out.println("1.Play");
-            System.out.println("2.Exit");
+            System.out.println("Bienvenido a LaddersN'Snakes");
+            System.out.println("1.Jugar");
+            System.out.println("2.Salir");
             option = reader.nextInt();
-
             if(option==1) {
-                System.out.println("Enter the number of rows that you want to add");
-                while (!reader.hasNextInt()) {
-                    reader.next();
-                    System.out.println("Invalid, enter a level number");
-                }
-                rows = reader.nextInt();
-                System.out.println("Enter the number of columns that you want to add");
-                while (!reader.hasNextInt()) {
-                    reader.next();
-                    System.out.println("Invalid, enter a level number");
-                }
-                columns = reader.nextInt();
-                boardSize=columns*rows;
-
-                board.generateBoard(boardSize);
-
-                board.print();
-                while(actualTurn <= 4){ //Condicion de parada, se debe cambiar
-                    board.showMenuInTurn(actualTurn);
-                    selectionOptionInmenuInTurn=reader.nextInt();
-
-                    if(selectionOptionInmenuInTurn==1) {
-
-                        int dice = (int) (Math.random() * 6 + 1);
-                        board.rollDice(dice, actualTurn);
-                        board.print();
-                        actualTurn++;
-                        if(actualTurn==4){
-                            actualTurn=1;
+                System.out.println("Ingrese el numero de filas que desea anadir");
+                    while (!reader.hasNextInt()) {
+                        reader.next();
+                        System.out.println("Invalido, ingrese un numero");
+                    }
+                    rows = reader.nextInt();
+                    System.out.println("Ingrese el numero de columnas que desea anadir");
+                    while (!reader.hasNextInt()) {
+                        reader.next();
+                        System.out.println("Invalido, ingrese un numero valido");
+                    }
+                    columns = reader.nextInt();
+                    boardSize = columns * rows;
+                    board.generateBoard(1,boardSize);
+                    System.out.println("Ingrese el numero de serpientes");
+                    while (!reader.hasNextInt()) {
+                        reader.next();
+                        System.out.println("Invalido, ingrese un numero valido");
+                    }
+                    snakes=reader.nextInt();
+                    board.print(rows, columns);
+                    Instant start = Instant.now();
+                    while (!board.finishGame()) {
+                        board.showMenuInTurn(actualTurn);
+                        selectionOptionInmenuInTurn = reader.nextInt();
+                        if (selectionOptionInmenuInTurn == 1) {
+                            int dice = (int) (Math.random() * 6 + 1);
+                            board.rollDice(dice, actualTurn);
+                            board.print(rows, columns);
+                            actualTurn++;
+                            if (actualTurn == 4) {
+                                actualTurn = 1;
+                            }
+                        } else {
+                            board.generateSnakes(snakes, boardSize);
                         }
                     }
-                    else{
-
-                    }
+                    Instant end = Instant.now();
+                    Duration interval = Duration.between(start, end);
+                    int time = (int) interval.getSeconds();
+                    board.addScore(time);
+                    actualTurn=1;
+                    board.leaderBoard();
+                    System.out.println("\nReiniciando juego...");
+                    board.cleanBoard();
                 }
-
-                System.out.println("Ingrese el numero de serpientes");
-                  while (!reader.hasNextInt()) {
-                  reader.next();
-                   System.out.println("Invalid, enter a level number");
-               }
-                snakes=reader.nextInt();
-
-               while (boardSize/7>=snakes){
-                  System.out.println("You have reach the maximum of snakes");
-                   System.out.println("Enter the number of snakes again");
-                  snakes= reader.nextInt();
-              }
-              board.generateSnakes(3,boardSize);
-            }
         } while (option!=2);
     }
+
 }
