@@ -63,7 +63,7 @@ public class Main {
                     int time = (int) interval.getSeconds();
                     board.addScore(time);
                     actualTurn=1;
-                    board.leaderBoard();
+                    board.getLeaderBoard();
                     System.out.println("\nReiniciando juego...");
                     board.cleanBoard();
                 }

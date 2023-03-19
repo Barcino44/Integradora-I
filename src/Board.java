@@ -8,7 +8,6 @@ public class Board {
     public static int counter = 0;
     private Node head; //Es la cabeza del tablero (casilla 1)
     private Node tail; //Es la cola del tablero (última casilla)
-    private NodeScore root; //Es la raíz del árbol de búsqueda.
     public Node actualNode; // Me guarda el nodo actual.
 
     //Es mejor tener los jugadores en board para que no tengamos que acceder a algún nodo si queremos hacer operacion con ellos.
@@ -281,75 +280,38 @@ public class Board {
         }
     }
     /*
-    Anado nodos al arbol binario de busqueda en caso de que la root esté vacia.
-     */
-    public void addScore(double time) {
+   Anado nodos al arbol binario de busqueda.
+    */
+    public void addScore(double time) { //Seteo el puntaje del jugador y añado el puntaje al árbol.
         double score = (600 - time) / 6;
         if (tail.getPlayerOne() != null) {
             playerOne.setScore(score);
             NodeScore newNodeScore = new NodeScore(playerOne.getScore(), playerOne);
-            if (root == null) {
-                root = newNodeScore;
+            if (BST.getRoot() == null) {
+                BST.setRoot(newNodeScore);
             } else {
-                addNode(root, newNodeScore);
+                BST.addNode(BST.getRoot(), newNodeScore);
             }
         } else if (tail.getPlayerTwo() != null) {
             playerTwo.setScore(score);
             NodeScore newNodeScore = new NodeScore(playerTwo.getScore(), playerTwo);
-            if (root == null) {
-                root = newNodeScore;
+            if (BST.getRoot() == null) {
+                BST.setRoot(newNodeScore);
             } else {
-                addNode(root, newNodeScore);
+                BST.addNode(BST.getRoot(), newNodeScore);
             }
         } else if (tail.getPlayerThree() != null) {
             playerThree.setScore(score);
             NodeScore newNodeScore = new NodeScore(playerThree.getScore(), playerThree);
-            if (root == null) {
-                root = newNodeScore;
+            if (BST.getRoot()== null) {
+                BST.setRoot(newNodeScore);
             } else {
-                addNode(root, newNodeScore);
+                BST.addNode(BST.getRoot(), newNodeScore);
             }
         }
     }
-    /*
-     Anado los nodos de tipo nodeScore al arbol binario de busqueda en caso de que la root no este vacia.
-    */
-    private void addNode(NodeScore current, NodeScore nodeScore) {
-        //Meter a la izquierda
-        if (nodeScore.getScore() < current.getScore()) { //Si el nodo entrante comparado con el nodo actual, es menor, lo ponemos a la izq
-            if (current.getLeft() == null) { //Aqui es si el nodo de la izquierda esta vacia, si es a si, colocamos el nodo nuevo.
-                current.setLeft(nodeScore);
-            } else {
-                addNode(current.getLeft(), nodeScore); //Si no, vamos a la izq y volvemos a hacer el llamado al metodo.
-            }
-        } else if (nodeScore.getScore() > current.getScore()) { //Si el nodo entrante comparado con el actual es mayor, lo ponemos a la der.
-            //Meter a la derecha
-            if (current.getRight() == null) { //Si la derecha del actual esta vacio, colocamos el nodo alli.
-                current.setRight(nodeScore);
-            } else {
-                addNode(current.getRight(), nodeScore);//Si no, vamos a la der y volvemos a hacer el llamado al metodo.
-            }
-
-        } else {
-            //No hacer nada
-        }
-    }
-    /*
-    Activador leaderBoard.
-     */
-    public void leaderBoard() {
-        leaderBoard(root);
-    }
-    /*Imprimir puntajes en orden ascendente
-    Este metodo imprime los puntajes en orden descendente
-     */
-    private void leaderBoard(NodeScore current) {
-        if (current == null) { //Caso base, si el actual es ==null, retorna todo el metodo, el proceso de impresion inicia...
-            return;
-        }
-        leaderBoard(current.getRight());//Como el mayor es el de la der, nos dirijimos a el, cuando no haya más izquierda, imprime, regresa a la rama principal y se va a la izq, asi hasta terminar con todos los datos.
-        System.out.print("\nPlayer "+current.getPlayer().getIcon()+ " con un puntaje de " + current.getScore());
-        leaderBoard(current.getLeft());
+    public void getLeaderBoard(){
+        BST.leaderBoard();
     }
 }
 
