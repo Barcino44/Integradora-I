@@ -7,8 +7,11 @@ public class Main {
         Scanner reader = new Scanner(System.in);
 
         Board board = new Board();
-
-
+        
+        menu();
+    }
+    
+    public static void menu(){
         int actualTurn=1; //contador de turnos
         int snakes, ladders=0;
         int option, selectionOptionInmenuInTurn;
@@ -81,5 +84,7 @@ public class Main {
                 }
         } while (option!=2);
     }
+
+
 
 }
