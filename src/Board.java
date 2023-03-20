@@ -11,16 +11,16 @@ public class Board {
     private Node head; //Es la cabeza del tablero (casilla 1)
     private Node tail; //Es la cola del tablero (última casilla)
     public Node actualNode; // Me guarda el nodo actual.
+    public static boolean isEmptySnakeHead = false;
+    public static boolean isEmptySnakeTail = false;
     public static char i = 'A';
-    public static int snakeTail =0;
-    public static int snakeHead =0;
+    public static int snakeTail = 0;
+    public static int snakeHead = 0;
 
     //Es mejor tener los jugadores en board para que no tengamos que acceder a algún nodo si queremos hacer operacion con ellos.
     Player playerOne = new Player(1, "$", 0);
     Player playerTwo = new Player(2, "%", 0);
     Player playerThree = new Player(3, "#", 0);
-
-    private final LinkedList<Integer> snakes = new LinkedList<>();
     Random random = new Random();
 
     public void generateBoard(int i, int boardSize) {
@@ -42,50 +42,67 @@ public class Board {
         generateBoardRecursive(i + 1, boardSize);
     }
 
-    public void generateSnakes(int numberOfSnakes, int boardSize) {
-        snakeHead=random.nextInt(boardSize / 2, boardSize - 1);
-        snakeTail=random.nextInt(2, boardSize / 2);
-        generateSnakes(head, numberOfSnakes, boardSize);
-
-    }
-    private void generateSnakes(Node current, int numberOfSnakes, int boardSize) {
-        if (numberOfSnakes == 0) {
+    public void verifyEmptySpaceHead(Node current) {
+        if (current.getSnake() == null && snakeHead == current.getNumber()) {
+            isEmptySnakeHead = true;
+            return;
+        } else if (current.getSnake() != null && snakeHead == current.getNumber()) {
+            isEmptySnakeHead = false;
             return;
         }
+        verifyEmptySpaceHead(current.getNext());
+    }
+
+    private void verifyEmptySpaceTail(Node current){
+            if (current.getSnake() == null && snakeTail == current.getNumber()) {
+                isEmptySnakeTail = true;
+                return;
+            }
+            else if(current.getSnake() != null&&snakeTail==current.getNumber()){
+                isEmptySnakeTail =false;
+                return;
+            }
+            verifyEmptySpaceTail(current.getNext());
+        }
+    public void generateSnakes(int numberOfSnakes, int boardSize) {
+        if(numberOfSnakes==0) {
+            i='A';
+            return;
+        }
+        randomHead(boardSize);
+        randomTail(boardSize);
+        verifyEmptySpaceHead(head);
+        verifyEmptySpaceTail(head);
+            if (isEmptySnakeHead && isEmptySnakeTail) {
+                generateSnakes(head, numberOfSnakes, boardSize);
+            } else {
+                generateSnakes(numberOfSnakes, boardSize);
+            }
+    }
+    private void generateSnakes(Node current, int numberOfSnakes, int boardSize) {
         if (current == null) {
-            snakeHead=random.nextInt(boardSize / 2, boardSize - 1);
-            snakeTail=random.nextInt(2, boardSize / 2);
             i++;
-            generateSnakes(head,numberOfSnakes-1,boardSize);
+            generateSnakes(numberOfSnakes-1,boardSize);
         }
         else {
             char ser = i;
-            if (current.getNumber() == snakeTail) {
-                if (current.getSnake() == null) {
+                if (current.getNumber() == snakeTail) {
                     Snake snake = new Snake(' ', ser);
                     current.setSnake(snake);
                 }
-                else{
-                    randomAgain(boardSize);
-                    generateSnakes(current,numberOfSnakes,boardSize);
-                }
-            }
-            if (current.getNumber() == snakeHead) {
-                if (current.getSnake() == null) {
+                else if(current.getNumber() == snakeHead) {
                     Snake snake = new Snake(ser, ' ');
                     current.setSnake(snake);
                 }
-                else{
-                    randomAgain(boardSize);
-                    generateSnakes(current,numberOfSnakes,boardSize);
-                }
+                generateSnakes(current.getNext(), numberOfSnakes, boardSize);
             }
-            generateSnakes(current.getNext(), numberOfSnakes, boardSize);
-        }
     }
-    private void randomAgain(int boardSize){
+
+    private void randomHead(int boardSize){
         snakeHead=random.nextInt(boardSize / 2, boardSize - 1);
-        snakeTail=random.nextInt(2, boardSize / 2);
+    }
+    private void randomTail(int boardSize) {
+        snakeTail = random.nextInt(2, boardSize / 2);
     }
     public void printSnakesNLaddersBoard(int rows, int columns) {
         printLaddersNSnakes(tail, rows, columns);
@@ -106,12 +123,24 @@ public class Board {
                 System.out.println();
                 counter = 0;
                 printReverseLaddersNSnakes(current, rows, columns);
-                continuePrintingLaddersNSnake(rows, columns);
+                continuePrintingLaddersNSnakePairRows(rows, columns);
             }
-        } else { //Significa que el número de filas es impar. Como imprimo desde la cola, para que el primer nodo quede en la esquina inferior izq debo comenzar imprimiendo en reversa.
-            if (counter != columns) {
+        }  else { //Significa que el número de filas es impar. Como imprimo desde la cola, para que el primer nodo quede en la esquina inferior izq debo comenzar imprimiendo en reversa.
+            if (counter < columns) {
                 printReverseLaddersNSnakes(current, rows, columns); //Cuando imprimo en reversa <- , llego a la ultima casilla.
-                continuePrintingLaddersNSnake(rows, columns);  //Este método me guarda esa casilla y vuelve a llamar a este método para que me imprima para el otro lado ->.
+                continuePrintingLaddersNSnakeNoPairRows(rows, columns);//Este método me guarda esa casilla y vuelve a llamar a este método para que me imprima para el otro lado ->.
+            }
+            else{
+                if(counter>columns*2-1){
+                    counter=0;
+                    System.out.println();
+                    printLaddersNSnakes(current,rows,columns);
+                }
+                else {
+                    counter++;
+                    System.out.print(current.printLaddersNSnakesStatus() + " ");
+                    printLaddersNSnakes(current.getPrevious(), rows, columns);
+                }
             }
         }
     }
@@ -128,8 +157,15 @@ public class Board {
         printReverseLaddersNSnakes(current.getPrevious(), rows, columns); //Hago recursion hasta que se cumplan los casos bases.
         System.out.print(current.printLaddersNSnakesStatus() + " "); //Cuando hago return, me imprime de atrás para adelante.
     }
-    public void continuePrintingLaddersNSnake(int rows, int columns) {
+    public void continuePrintingLaddersNSnakePairRows(int rows, int columns) {
         if (actualNode != null) {
+            System.out.println();
+            printLaddersNSnakes(actualNode, rows, columns); //Vuelvo a llamar a print row para que me continue con la impresión.
+        }
+    }
+    public void continuePrintingLaddersNSnakeNoPairRows(int rows, int columns) {
+        if (actualNode != null) {
+            counter=columns;
             System.out.println();
             printLaddersNSnakes(actualNode, rows, columns); //Vuelvo a llamar a print row para que me continue con la impresión.
         }
@@ -224,7 +260,10 @@ public class Board {
 //            }
 //        }
 //    }
-    public void verifySnake(Node current) {
+    public void verifySnake(){
+        verifySnake(head);
+    }
+    private void verifySnake(Node current) {
         if(current==null){
             return;
         }
@@ -248,37 +287,23 @@ public class Board {
     }
 
     public void goToBackWard(Node current, char snakeHead, Player player) {
-        if (current == null) {
-            return;
-        }
-        if (current.getSnake()!=null&&current.getSnake().getHead() != ' ') {
+        if (current.getSnake()!=null) {
             if (current.getSnake().getTail()==snakeHead) {
-                Player thePlayer = playerOne;
-                current.setPlayerOne(null);
-                goToBackWard(current.getPrevious());
-                if (headSnake == current.getSnake().getTail()) {
-                    current.setPlayerOne(thePlayer);
+                if(player==playerOne){
+                    current.setPlayerOne(playerOne);
                     return;
                 }
-            } else if (current.getPlayerTwo() != null) {
-                Player thePlayer = playerTwo;
-                current.setPlayerTwo(null);
-                goToBackWard(current.getPrevious());
-                if (headSnake == current.getSnake().getTail()) {
-                    current.setPlayerTwo(thePlayer);
+                else if(player==playerTwo){
+                    current.setPlayerTwo(playerTwo);
                     return;
                 }
-            } else if (current.getPlayerThree() != null) {
-                Player thePlayer = playerThree;
-                current.setPlayerThree(null);
-                goToBackWard(current.getPrevious());
-                if (headSnake == current.getSnake().getTail()) {
-                    current.setPlayerThree(thePlayer);
+                else if(player==playerThree){
+                    current.setPlayerThree(playerThree);
                     return;
                 }
             }
         }
-        goToBackWard(current.getNext());
+        goToBackWard(current.getPrevious(),snakeHead,player);
     }
     /*
     Activador de impresión.
@@ -302,12 +327,24 @@ public class Board {
                 System.out.println();
                 counter = 0;
                 printReverseRow(current, rows, columns);
-                continuePrinting(rows, columns);
+                continuePrintingPairRows(rows, columns);
             }
         } else { //Significa que el número de filas es impar. Como imprimo desde la cola, para que el primer nodo quede en la esquina inferior izq debo comenzar imprimiendo en reversa.
-            if (counter != columns) {
+            if (counter < columns) {
                 printReverseRow(current, rows, columns); //Cuando imprimo en reversa <- , llego a la ultima casilla.
-                continuePrinting(rows, columns);  //Este método me guarda esa casilla y vuelve a llamar a este método para que me imprima para el otro lado ->.
+                continuePrintingNoPairRows(rows, columns);//Este método me guarda esa casilla y vuelve a llamar a este método para que me imprima para el otro lado ->.
+            }
+            else{
+                if(counter>columns*2-1){
+                    counter=0;
+                    System.out.println();
+                    printRow(current,rows,columns);
+                }
+                else {
+                    counter++;
+                    System.out.print(current.printStatus() + " ");
+                    printRow(current.getPrevious(), rows, columns);
+                }
             }
         }
     }
@@ -327,8 +364,15 @@ public class Board {
     /*
     Este método me permite seguir imprimiendo desde el nodo actual obtenido en print reverse.
      */
-    public void continuePrinting(int rows, int columns) {
+    public void continuePrintingPairRows(int rows, int columns) {
         if (actualNode != null) {
+            System.out.println();
+            printRow(actualNode, rows, columns); //Vuelvo a llamar a print row para que me continue con la impresión.
+        }
+    }
+    public void continuePrintingNoPairRows(int rows, int columns) {
+        if (actualNode != null) {
+            counter=columns;
             System.out.println();
             printRow(actualNode, rows, columns); //Vuelvo a llamar a print row para que me continue con la impresión.
         }

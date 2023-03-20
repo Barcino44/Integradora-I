@@ -49,7 +49,7 @@ public class Main {
                         if (selectionOptionInmenuInTurn == 1) {
                             int dice = (int) (Math.random() * 6 + 1);
                             board.rollDice(dice, actualTurn);
-                            board.goToBackWard();
+                            board.verifySnake();
                             board.print(rows, columns);
                             actualTurn++;
                             if (actualTurn == 4) {

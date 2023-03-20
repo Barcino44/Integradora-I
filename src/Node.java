@@ -136,6 +136,6 @@ public class Node {
         if(this.snake!=null&&this.snake.getTail()!= ' '){
             snake=this.getSnake().getTail();
         }
-        return "["+snake+"]";
+        return "["+number+snake+"]";
     }
 }
