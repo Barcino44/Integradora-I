@@ -2,7 +2,7 @@ public class Node {
     private int number;
     private Player playerOne, playerTwo, playerThree;
     private Snake snake;
-
+    private Ladder ladder;
     private Node next;
     private Node previous;
     private String letter;
@@ -25,13 +25,13 @@ public class Node {
         this.snake = snake;
     }
 
-//    public Node getLadder() {
-//        return ladder;
-//    }
-//
-//    public void setLadder(Node ladder) {
-//        this.ladder = ladder;
-//    }
+    public Ladder getLadder() {
+        return ladder;
+    }
+
+    public void setLadder(Ladder ladder) {
+        this.ladder = ladder;
+    }
 
     public int getNumber() {
         return number;
@@ -104,11 +104,11 @@ public class Node {
         if(playerThree!=null) {
             statusThree = playerThree.getIcon();
         }
-        return "[" + number +
+        return "[ " + number +
                 statusOne+
                 statusTwo+
                 statusThree+
-                "]";
+                " ]";
     }
     /*
     Me imprime el estado sin el número (Es clave para limpiar el tablero)
@@ -128,14 +128,21 @@ public class Node {
         }
         return statusOne+ statusTwo+ statusThree;
     }
-    public String printLaddersNSnakesStatus(){
-        char snake=' ';
-        if(this.snake!=null&&this.snake.getHead()!= ' '){
-            snake=this.snake.getHead();
+    public String printLaddersNSnakesStatus() {
+        String snake = "";
+        String ladder = "" ;
+        if (this.snake != null && this.snake.getHead() != ' ') {
+            snake = String.valueOf(this.snake.getHead());
         }
-        if(this.snake!=null&&this.snake.getTail()!= ' '){
-            snake=this.getSnake().getTail();
+        if (this.snake != null && this.snake.getTail() != ' ') {
+            snake = String.valueOf(this.snake.getTail());
         }
-        return "["+number+snake+"]";
+        if (this.ladder != null && this.ladder.getTail() != 0){
+            ladder =String.valueOf(this.ladder.getTail());
+        }
+        if(this.ladder !=null && this.ladder.getHead()!=0){
+            ladder = String.valueOf(this.ladder.getHead());
+        }
+        return "[ " +snake+ladder+" ]";
     }
 }

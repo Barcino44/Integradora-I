@@ -40,7 +40,14 @@ public class Main {
                         System.out.println("Invalido, ingrese un numero valido");
                     }
                     snakes=reader.nextInt();
+                    System.out.println("Ingrese el numero de escaleras");
+                     while (!reader.hasNextInt()) {
+                        reader.next();
+                        System.out.println("Invalido, ingrese un numero valido");
+                    }
+                    ladders=reader.nextInt();
                     board.generateSnakes(snakes, boardSize);
+                    board.generateLadders(ladders,boardSize);
                     board.print(rows, columns);
                     Instant start = Instant.now();
                     while (!board.finishGame()) {
@@ -50,6 +57,7 @@ public class Main {
                             int dice = (int) (Math.random() * 6 + 1);
                             board.rollDice(dice, actualTurn);
                             board.verifySnake();
+                            board.verifyLadder();
                             board.print(rows, columns);
                             actualTurn++;
                             if (actualTurn == 4) {
@@ -64,8 +72,11 @@ public class Main {
                     int time = (int) interval.getSeconds();
                     board.addScore(time);
                     actualTurn=1;
+                    System.out.println("\nFin de la partida\n");
+                    System.out.print("Lista de puntajes:");
                     board.getLeaderBoard();
-                    System.out.println("\nReiniciando juego...");
+                    System.out.println();
+                    System.out.println("\nReiniciando juego...\n");
                     board.cleanBoard();
                 }
         } while (option!=2);

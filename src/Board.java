@@ -11,11 +11,16 @@ public class Board {
     private Node head; //Es la cabeza del tablero (casilla 1)
     private Node tail; //Es la cola del tablero (última casilla)
     public Node actualNode; // Me guarda el nodo actual.
-    public static boolean isEmptySnakeHead = false;
-    public static boolean isEmptySnakeTail = false;
-    public static char i = 'A';
-    public static int snakeTail = 0;
-    public static int snakeHead = 0;
+    public static boolean isEmptySnakeHead = false; //Me verifica si la cabeza de la serpiente esta vacia para poder añadir una alli.
+    public static boolean isEmptySnakeTail = false; //Me verifica si la cola de la serpiente esta vacia para poder añadir una alli.
+    public static char i = 'A'; //Identificador de la serpiente
+    public static int snakeTail = 0; //Me da la posicion de la cola de la serpiente (interactua con random)
+    public static int snakeHead = 0; //Me da la posicion de la cola de la serpiente (interactua con random)
+    public static boolean isEmptyLadderHead =false;
+    public static boolean isEmptyLadderTail=false;
+    public static int ladderId=0;
+    public static int ladderTail=1;
+    public static  int ladderHead=0;
 
     //Es mejor tener los jugadores en board para que no tengamos que acceder a algún nodo si queremos hacer operacion con ellos.
     Player playerOne = new Player(1, "$", 0);
@@ -42,37 +47,37 @@ public class Board {
         generateBoardRecursive(i + 1, boardSize);
     }
 
-    public void verifyEmptySpaceHead(Node current) {
-        if (current.getSnake() == null && snakeHead == current.getNumber()) {
+    public void verifyEmptySpaceHeadSnake(Node current) {
+        if (current.getSnake() == null &&current.getLadder()==null && snakeHead == current.getNumber()) {
             isEmptySnakeHead = true;
             return;
-        } else if (current.getSnake() != null && snakeHead == current.getNumber()) {
+        } else if ((current.getSnake() != null || current.getLadder()!=null) && snakeHead == current.getNumber()) {
             isEmptySnakeHead = false;
             return;
         }
-        verifyEmptySpaceHead(current.getNext());
+        verifyEmptySpaceHeadSnake(current.getNext());
     }
 
-    private void verifyEmptySpaceTail(Node current){
-            if (current.getSnake() == null && snakeTail == current.getNumber()) {
+    private void verifyEmptySpaceTailSnake(Node current){
+            if (current.getLadder() == null && current.getSnake()==null&& snakeTail == current.getNumber()) {
                 isEmptySnakeTail = true;
                 return;
             }
-            else if(current.getSnake() != null&&snakeTail==current.getNumber()){
+            else if((current.getSnake() != null||current.getLadder()!=null)&&snakeTail==current.getNumber()){
                 isEmptySnakeTail =false;
                 return;
             }
-            verifyEmptySpaceTail(current.getNext());
+            verifyEmptySpaceTailSnake(current.getNext());
         }
     public void generateSnakes(int numberOfSnakes, int boardSize) {
         if(numberOfSnakes==0) {
-            i='A';
+            ladderId=1;
             return;
         }
-        randomHead(boardSize);
-        randomTail(boardSize);
-        verifyEmptySpaceHead(head);
-        verifyEmptySpaceTail(head);
+        randomHeadSnake(boardSize);
+        randomTailSnake(boardSize);
+        verifyEmptySpaceHeadSnake(head);
+        verifyEmptySpaceTailSnake(head);
             if (isEmptySnakeHead && isEmptySnakeTail) {
                 generateSnakes(head, numberOfSnakes, boardSize);
             } else {
@@ -97,12 +102,71 @@ public class Board {
                 generateSnakes(current.getNext(), numberOfSnakes, boardSize);
             }
     }
-
-    private void randomHead(int boardSize){
+    private void randomHeadSnake(int boardSize){
         snakeHead=random.nextInt(boardSize / 2, boardSize - 1);
     }
-    private void randomTail(int boardSize) {
+    private void randomTailSnake(int boardSize) {
         snakeTail = random.nextInt(2, boardSize / 2);
+    }
+    public void verifyEmptySpaceHeadLadder(Node current) {
+        if (current.getLadder() == null && current.getSnake()==null && ladderHead == current.getNumber()) {
+            isEmptyLadderHead = true;
+            return;
+        } else if ((current.getSnake() != null || current.getLadder()!=null) && ladderHead==current.getNumber()) {
+            isEmptyLadderHead = false;
+            return;
+        }
+        verifyEmptySpaceHeadLadder(current.getNext());
+    }
+    private void verifyEmptySpaceTailLadder(Node current){
+        if (current.getSnake() == null && current.getLadder()==null && ladderTail == current.getNumber()) {
+            isEmptyLadderTail = true;
+            return;
+        } else if ((current.getSnake() != null || current.getLadder()!=null) && ladderTail==current.getNumber()) {
+            isEmptyLadderTail = false;
+            return;
+        }
+        verifyEmptySpaceTailLadder(current.getNext());
+    }
+    public void generateLadders(int numberOfLadders, int boardSize) {
+        if(numberOfLadders==0) {
+            ladderId=0;
+            return;
+        }
+        randomHeadLadder(boardSize);
+        randomTailLadder(boardSize);
+        verifyEmptySpaceTailLadder(head);
+        verifyEmptySpaceHeadLadder(head);
+        if (isEmptyLadderHead && isEmptyLadderTail) {
+            generateLadders(head, numberOfLadders, boardSize);
+        } else {
+            generateLadders(numberOfLadders, boardSize);
+        }
+    }
+    private void generateLadders(Node current, int numberOfSnakes, int boardSize) {
+        if (current == null) {
+            ladderId++;
+            generateLadders(numberOfSnakes-1,boardSize);
+        }
+        else {
+            int escalera = ladderId;
+            if (current.getNumber() == ladderTail) {
+                Ladder ladder = new Ladder(0, escalera);
+                current.setLadder(ladder);
+            }
+            else if(current.getNumber() == ladderHead) {
+                Ladder ladder = new Ladder(escalera, 0);
+                current.setLadder(ladder);
+            }
+            generateLadders(current.getNext(), numberOfSnakes, boardSize);
+        }
+    }
+
+    private void randomHeadLadder(int boardSize) {
+        ladderHead = random.nextInt(boardSize / 2, boardSize - 1);
+    }
+    private void randomTailLadder(int boardSize) {
+        ladderTail = random.nextInt(2, boardSize / 2);
     }
     public void printSnakesNLaddersBoard(int rows, int columns) {
         printLaddersNSnakes(tail, rows, columns);
@@ -203,7 +267,6 @@ public class Board {
     public void rollDice(int dice, int actualTurn) {
 
         rollDice(head, dice, actualTurn);
-
     }
     /*
     Tirar dado.
@@ -247,19 +310,7 @@ public class Board {
             }
         }
     }
-//    public void goToBackward( Node current, Player thePlayer) {
-//        if(current.getSnake().getHead()!=' '){
-//            char headOfSnake=current.getSnake().getHead();
-//            if(current.getPlayerOne()!=null) {
-//                Player thePlayer = current.getPlayerOne();
-//                current.setPlayerOne(null);
-//                if (headOfSnake == current.getSnake().getTail()) {
-//                    current.setPlayerOne(thePlayer);
-//                    return;
-//                }
-//            }
-//        }
-//    }
+
     public void verifySnake(){
         verifySnake(head);
     }
@@ -304,6 +355,51 @@ public class Board {
             }
         }
         goToBackWard(current.getPrevious(),snakeHead,player);
+    }
+    public void verifyLadder(){
+        verifyLadder(head);
+    }
+    private void verifyLadder(Node current) {
+        if(current==null){
+            return;
+        }
+        if (current.getLadder() != null && current.getLadder().getTail() != 0) {
+            int tailLadder = current.getLadder().getTail();
+            if (current.getPlayerOne() != null) {
+                Player thePlayer = playerOne;
+                current.setPlayerOne(null);
+                goToForward(current,tailLadder,thePlayer);
+            } else if (current.getPlayerTwo() != null) {
+                Player thePlayer = playerTwo;
+                current.setPlayerTwo(null);
+                goToForward(current,tailLadder,thePlayer);
+            } else if (current.getPlayerThree() != null) {
+                Player thePlayer = playerThree;
+                current.setPlayerThree(null);
+                goToForward(current,tailLadder,thePlayer);
+            }
+        }
+        verifyLadder(current.getNext());
+    }
+
+    public void goToForward(Node current, int tailLadder, Player player) {
+        if (current.getLadder()!=null) {
+            if (current.getLadder().getHead()==tailLadder) {
+                if(player==playerOne){
+                    current.setPlayerOne(playerOne);
+                    return;
+                }
+                else if(player==playerTwo){
+                    current.setPlayerTwo(playerTwo);
+                    return;
+                }
+                else if(player==playerThree){
+                    current.setPlayerThree(playerThree);
+                    return;
+                }
+            }
+        }
+        goToForward(current.getNext(),tailLadder,player);
     }
     /*
     Activador de impresión.
@@ -446,6 +542,7 @@ public class Board {
     }
     public void getLeaderBoard(){
         BST.leaderBoard();
+
     }
 }
 
