@@ -1,7 +1,8 @@
 public class Node {
     private int number;
     private Player playerOne, playerTwo, playerThree;
-    private Node snake, ladder;
+    private Snake snake;
+
     private Node next;
     private Node previous;
     private String letter;
@@ -16,21 +17,21 @@ public class Node {
         this.playerThree = playerThree;
     }
 
-    public Node getSnake() {
+    public Snake getSnake() {
         return snake;
     }
 
-    public void setSnake(Node snake) {
+    public void setSnake(Snake snake) {
         this.snake = snake;
     }
 
-    public Node getLadder() {
-        return ladder;
-    }
-
-    public void setLadder(Node ladder) {
-        this.ladder = ladder;
-    }
+//    public Node getLadder() {
+//        return ladder;
+//    }
+//
+//    public void setLadder(Node ladder) {
+//        this.ladder = ladder;
+//    }
 
     public int getNumber() {
         return number;
@@ -127,5 +128,14 @@ public class Node {
         }
         return statusOne+ statusTwo+ statusThree;
     }
-
+    public String printLaddersNSnakesStatus(){
+        char snake=' ';
+        if(this.snake!=null&&this.snake.getHead()!= ' '){
+            snake=this.snake.getHead();
+        }
+        if(this.snake!=null&&this.snake.getTail()!= ' '){
+            snake=this.getSnake().getTail();
+        }
+        return "["+snake+"]";
+    }
 }

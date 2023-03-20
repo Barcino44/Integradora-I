@@ -2,7 +2,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Scanner;
 public class Main {
-    public static int counter=0;
     public static void main(String[] args) {
 
         Scanner reader = new Scanner(System.in);
@@ -41,6 +40,7 @@ public class Main {
                         System.out.println("Invalido, ingrese un numero valido");
                     }
                     snakes=reader.nextInt();
+                    board.generateSnakes(snakes, boardSize);
                     board.print(rows, columns);
                     Instant start = Instant.now();
                     while (!board.finishGame()) {
@@ -49,13 +49,14 @@ public class Main {
                         if (selectionOptionInmenuInTurn == 1) {
                             int dice = (int) (Math.random() * 6 + 1);
                             board.rollDice(dice, actualTurn);
+                            board.goToBackWard();
                             board.print(rows, columns);
                             actualTurn++;
                             if (actualTurn == 4) {
                                 actualTurn = 1;
                             }
-                        } else {
-                            board.generateSnakes(snakes, boardSize);
+                        } else if (selectionOptionInmenuInTurn==2){
+                            board.printSnakesNLaddersBoard(rows,columns);
                         }
                     }
                     Instant end = Instant.now();
